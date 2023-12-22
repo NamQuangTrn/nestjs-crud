@@ -19,8 +19,8 @@ async function bootstrap() {
 
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
-  // console.log(">>check path: ", join(__dirname, '..', 'public'))
   app.setViewEngine('ejs');
+  
   app.useGlobalPipes(new ValidationPipe());
   //config cookie
   app.use(cookieParser());

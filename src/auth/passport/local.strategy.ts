@@ -14,6 +14,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException('username/password khong hop le');
     }
-    return user;
+    return user; // gan vao req.user
   }
 }

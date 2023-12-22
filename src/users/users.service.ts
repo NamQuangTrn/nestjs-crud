@@ -10,11 +10,14 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from './users.interface';
 import aqp from 'api-query-params';
 import { isEmpty } from 'class-validator';
+import { USER_ROLE } from 'src/databases/sample';
+import { Role, RoleDocument } from 'src/roles/schemas/role.schema';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(UserM.name) private userModel: SoftDeleteModel<UserDocument>,
+    @InjectModel(Role.name) private roleModel: SoftDeleteModel<RoleDocument>,
   ) {}
   getHashPassword = (plainPassword: string) => {
     const salt = genSaltSync(10);
@@ -85,12 +88,15 @@ export class UsersService {
       .findOne({
         _id: id,
       })
-      .select('-password');
+      .select('-password')
+      .populate({ path: 'role', select: { name: 1, _id: 1 } });
   }
   findOneByUsername(username: string) {
-    return this.userModel.findOne({
-      email: username,
-    });
+    return this.userModel
+      .findOne({
+        email: username,
+      })
+      .populate({ path: 'role', select: { name: 1 } });
   }
   isValidPassword(password: string, hash: string) {
     return compareSync(password, hash);
@@ -112,6 +118,9 @@ export class UsersService {
 
   async remove(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id)) return `not found user`;
+    const foundUser = await this.userModel.findById(id);
+    if (foundUser && foundUser.email === 'abcd@gmail.com')
+      throw new BadRequestException('khong the xoa admin');
     await this.userModel.updateOne(
       { _id: id },
       { deletedBy: { _id: user._id, email: user.email } },
@@ -122,6 +131,8 @@ export class UsersService {
     const { name, email, age, gender, address } = user;
     const isExist = await this.userModel.findOne({ email });
     if (isExist) throw new BadRequestException(`email ${email} da ton tai`);
+    //fetch uset role
+    const userRole = await this.roleModel.findOne({ name: USER_ROLE });
     const hashPassword = this.getHashPassword(user.password);
     const newUserRegister = await this.userModel.create({
       name,
@@ -130,7 +141,7 @@ export class UsersService {
       age,
       gender,
       address,
-      role: 'user',
+      role: userRole?._id,
     });
 
     return newUserRegister;
@@ -139,6 +150,9 @@ export class UsersService {
     return await this.userModel.updateOne({ _id }, { refreshToken });
   }
   async findUserByToken(refreshToken: string) {
-    return await this.userModel.findOne({ refreshToken });
+    return await this.userModel.findOne({ refreshToken }).populate({
+      path: 'role',
+      select: { name: 1 },
+    });
   }
 }

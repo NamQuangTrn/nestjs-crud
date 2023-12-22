@@ -1,4 +1,4 @@
-import { Injectable, Query } from '@nestjs/common';
+import { BadRequestException, Injectable, Query } from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Company, CompanyDocument } from './schemas/company.schema';
@@ -20,6 +20,7 @@ export class CompaniesService {
       name: createCompanyDto.name,
       address: createCompanyDto.address,
       description: createCompanyDto.description,
+      logo: createCompanyDto.logo,
       createdBy: {
         _id: user._id,
         email: user.email,
@@ -61,12 +62,10 @@ export class CompaniesService {
     };
   }
 
-  findOne(id: string) {
-    console.log(mongoose.Types.ObjectId.isValid(id));
-    if (!mongoose.Types.ObjectId.isValid(id)) return `loi roi dcm`;
-    return this.companyModel.findOne({
-      _id: id,
-    });
+  async findOne(id: string) {
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new BadRequestException(`not found company with id=${id}`);
+    return await this.companyModel.findById({ id });
   }
 
   async update(id: string, updateCompanyDto: UpdateCompanyDto, user: IUser) {
