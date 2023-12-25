@@ -26,7 +26,7 @@ export class AuthService {
         const temp = await this.rolesService.findOne(userRole._id);
         const objUser = {
           ...user.toObject(),
-          permission: temp?.permission ?? [],
+          permissions: temp?.permissions ?? [],
         };
         return objUser;
       }
@@ -34,7 +34,7 @@ export class AuthService {
     return null;
   }
   async login(user: IUser, res: Response) {
-    const { _id, name, email, role, permission } = user;
+    const { _id, name, email, role, permissions } = user;
     const payload = {
       sub: 'token login',
       iss: 'from server',
@@ -58,7 +58,7 @@ export class AuthService {
         name,
         email,
         role,
-        permission,
+        permissions,
       },
     };
   }
@@ -112,7 +112,7 @@ export class AuthService {
             name,
             email,
             role,
-            permission: temp?.permission ?? [],
+            permissions: temp?.permissions ?? [],
           },
         };
       } else

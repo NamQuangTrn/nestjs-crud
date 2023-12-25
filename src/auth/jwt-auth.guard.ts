@@ -39,7 +39,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const tagetMethod = request.method;
     const tagetEndpoint = request.route?.path as string;
 
-    const permission = user?.permission ?? [];
+    const permission = user?.permissions ?? [];
     let isExist = permission.find(
       (permission) =>
         tagetMethod === permission.method &&

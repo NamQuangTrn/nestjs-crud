@@ -24,6 +24,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // gan them permission vao req.user
     const userRole = role as unknown as { _id: string; name: string };
     const temp = await this.rolesService.findOne(userRole._id);
-    return { _id, name, email, role, permission: temp?.permission ?? [] };
+    return { _id, name, email, role, permissions: temp?.permissions ?? [] };
   }
 }

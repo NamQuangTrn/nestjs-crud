@@ -17,14 +17,14 @@ export class RolesService {
     private roleModel: SoftDeleteModel<RoleDocument>,
   ) {}
   async create(createRoleDto: CreateRoleDto, user: IUser) {
-    const { name, description, permission, isActive } = createRoleDto;
+    const { name, description, permissions, isActive } = createRoleDto;
     const isExist = await this.roleModel.findOne({ name });
     if (isExist) throw new BadRequestException('role da ton tai');
     const { _id, email } = user;
     const newRole = await this.roleModel.create({
       name,
       description,
-      permission,
+      permissions,
       isActive,
       createdBy: { _id, email },
     });
@@ -72,16 +72,16 @@ export class RolesService {
     if (!mongoose.Types.ObjectId.isValid(id))
       throw new BadRequestException('not found role');
     return (await this.roleModel.findById(id)).populate({
-      path: 'permission',
+      path: 'permissions',
       select: { _id: 1, apiPath: 1, name: 1, method: 1, module: 1 },
     });
   }
 
-  async update(_id: string, updateRoleDto: UpdateRoleDto, user: IUser) {
+  async update(id: string, updateRoleDto: UpdateRoleDto, user: IUser) {
     return await this.roleModel.updateOne(
-      { _id },
+      { _id: id },
       {
-        ...UpdateRoleDto,
+        ...updateRoleDto,
         updatedBy: {
           _id: user._id,
           email: user.email,

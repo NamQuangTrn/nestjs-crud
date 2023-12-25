@@ -6,7 +6,7 @@ export interface IUser {
     _id: string;
     name: string;
   };
-  permission?: {
+  permissions?: {
     _id: string;
     name: string;
     apiPath: string;

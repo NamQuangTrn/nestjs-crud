@@ -83,7 +83,7 @@ export class SubscribersService {
     return await this.subscriberModel.updateOne(
       { _id: id },
       {
-        ...UpdateSubscriberDto,
+        ...updateSubscriberDto,
         updatedBy: {
           _id: user._id,
           email: user.email,

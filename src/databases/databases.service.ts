@@ -45,20 +45,19 @@ export class DatabasesService implements OnModuleInit {
 
       // create role
       if (countRole === 0) {
-    
         const permissions = await this.permissionModel.find({}).select('_id');
         await this.roleModel.insertMany([
           {
             name: ADMIN_ROLE,
             description: 'Admin thì full quyền :v',
             isActive: true,
-            permission: permissions,
+            permissions: permissions,
           },
           {
             name: USER_ROLE,
             description: 'Người dùng/Ứng viên sử dụng hệ thống',
             isActive: true,
-            permission: [], //không set quyền, chỉ cần add ROLE
+            permissions: [], //không set quyền, chỉ cần add ROLE
           },
         ]);
       }
